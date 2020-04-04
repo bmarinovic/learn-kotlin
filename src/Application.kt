@@ -1,14 +1,19 @@
 package com.example
 
+import com.example.api.users.UserApiService
+import com.example.api.users.UserApiServiceImpl
+import com.example.domain.users.UserDomainServiceImpl
 import com.example.routers.users
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.request.*
-import io.ktor.routing.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.features.*
-import io.ktor.auth.*
+import io.ktor.application.Application
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.features.CORS
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DataConversion
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.locations.Locations
+import io.ktor.routing.routing
 import io.ktor.serialization.json
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -27,7 +32,7 @@ fun Application.module(testing: Boolean = false) {
         header(HttpHeaders.Authorization)
         header("MyCustomHeader")
         allowCredentials = true
-        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+        anyHost()
     }
 
     install(DataConversion)
@@ -39,7 +44,12 @@ fun Application.module(testing: Boolean = false) {
         json()
     }
 
+    moduleWithDependencies(UserApiServiceImpl(UserDomainServiceImpl()))
+}
+
+fun Application.moduleWithDependencies(userApiService: UserApiService) {
+
     routing {
-        users()
+        users(userApiService)
     }
 }
