@@ -35,7 +35,7 @@ dependencies {
     compile "org.jetbrains.exposed:exposed-dao:$exposed_version"
     compile "org.jetbrains.exposed:exposed-jdbc:$exposed_version"
     compile "org.jetbrains.exposed:exposed-jodatime:$exposed_version"
-    compile "com.h2database:h2:1.4.191"
+    compile("org.postgresql:postgresql:42.2.2")
     compile "com.google.inject:guice:$guice_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
