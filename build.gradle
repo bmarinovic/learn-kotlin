@@ -9,6 +9,12 @@ buildscript {
     }
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 apply plugin: 'kotlin'
 apply plugin: 'application'
 apply plugin: 'kotlinx-serialization'
@@ -46,5 +52,7 @@ dependencies {
     implementation "io.ktor:ktor-serialization:$ktor_version"
     implementation "io.ktor:ktor-auth:$ktor_version"
     implementation "io.ktor:ktor-auth-jwt:$ktor_version"
+    implementation "com.sksamuel.hoplite:hoplite-core:$hoplite_version"
+    implementation "com.sksamuel.hoplite:hoplite-hocon:$hoplite_version"
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
 }

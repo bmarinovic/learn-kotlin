@@ -1,7 +1,7 @@
 package com.example.domain.users
 
 import com.example.core.toRole
-import com.example.domain.database.DbSettings.db
+import com.example.domain.database.DbSettings
 import com.google.inject.ImplementedBy
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -16,9 +16,9 @@ interface UserDomainService {
     suspend fun delete(id: Long): Boolean
 }
 
-class UserDomainServiceImpl : UserDomainService {
+class UserDomainServiceImpl(private val dbSettings: DbSettings) : UserDomainService {
     override suspend fun findById(id: Long): User? =
-        transaction(db) {
+        transaction(dbSettings.db) {
             UsersTable.select { UsersTable.id eq id }.singleOrNull()?.let {
                 User(
                     it[UsersTable.id].value,
@@ -34,7 +34,7 @@ class UserDomainServiceImpl : UserDomainService {
         }
 
     override suspend fun readAll(): List<User> =
-        transaction(db) {
+        transaction(dbSettings.db) {
             UsersTable.selectAll().map {
                 User(
                     it[UsersTable.id].value,
@@ -52,7 +52,7 @@ class UserDomainServiceImpl : UserDomainService {
 
     override suspend fun insert(userWrite: UserWrite): User {
 
-        val id = transaction(db) {
+        val id = transaction(dbSettings.db) {
             UsersTable.insertAndGetId {
                 it[email] = userWrite.email
                 it[firstName] = userWrite.firstName
@@ -68,7 +68,7 @@ class UserDomainServiceImpl : UserDomainService {
     }
 
     override suspend fun update(id: Long, userWrite: UserWrite): User? {
-        transaction(db) {
+        transaction(dbSettings.db) {
             UsersTable.update({ UsersTable.id eq id }) {
                 it[email] = userWrite.email
                 it[firstName] = userWrite.firstName
@@ -83,7 +83,7 @@ class UserDomainServiceImpl : UserDomainService {
     }
 
     override suspend fun delete(id: Long): Boolean =
-        transaction(db) {
+        transaction(dbSettings.db) {
             UsersTable.deleteWhere { UsersTable.id eq id }
         } > 0
 }
