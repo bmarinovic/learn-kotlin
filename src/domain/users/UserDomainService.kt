@@ -5,7 +5,7 @@ import com.example.domain.database.DbSettings.db
 import com.google.inject.ImplementedBy
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.joda.time.DateTime
+import java.time.LocalDateTime
 
 @ImplementedBy(UserDomainServiceImpl::class)
 interface UserDomainService {
@@ -59,8 +59,8 @@ class UserDomainServiceImpl : UserDomainService {
                 it[lastName] = userWrite.lastName
                 it[password] = userWrite.password
                 it[role] = userWrite.role.name
-                it[createdAt] = DateTime.now()
-                it[updatedAt] = DateTime.now()
+                it[createdAt] = LocalDateTime.now()
+                it[updatedAt] = LocalDateTime.now()
             }
         }
 
@@ -75,7 +75,7 @@ class UserDomainServiceImpl : UserDomainService {
                 it[lastName] = userWrite.lastName
                 it[password] = userWrite.password
                 it[role] = userWrite.role.name
-                it[updatedAt] = DateTime.now()
+                it[updatedAt] = LocalDateTime.now()
             }
         }
 
