@@ -1,6 +1,6 @@
 package com.example.routers
 
-import com.example.api.users.User
+import com.example.api.users.UserApiService
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.delete
@@ -12,45 +12,48 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import java.util.*
 
-fun Route.users() {
+fun Route.users(userApiService: UserApiService) {
 
     route("/users") {
 
         get {
-            call.respond(users)
+            call.respond(userApiService.readAll())
         }
 
         post {
-            users += call.receive<User>()
 
-            call.respond(HttpStatusCode.Created)
+            call.respond(userApiService.insert(call.receive()))
         }
 
         get<IntId> { userId ->
-            call.respond(users[userId.id])
+            val user = userApiService.findById(userId.id)
+
+            if (user == null)
+                call.respond(HttpStatusCode.NotFound)
+            else
+                call.respond(user)
         }
 
 
         put<IntId> { userId ->
-            users[userId.id] = call.receive()
 
-            call.respond(users[userId.id])
+            val user = userApiService.update(userId.id, call.receive())
+
+            if (user == null)
+                call.respond(HttpStatusCode.NotFound)
+            else
+                call.respond(user)
         }
 
         delete<IntId> { userId ->
-            users -= users[userId.id]
+            val userDeleted = userApiService.delete(userId.id)
 
-            call.respond(HttpStatusCode.NoContent)
+            if (userDeleted)
+                call.respond(HttpStatusCode.NoContent)
+            else
+                call.respond(HttpStatusCode.NotFound)
         }
     }
 
 }
-
-val users = Collections.synchronizedList(
-        mutableListOf(
-                User(1, "john", "123"),
-                User(2, "jack", "555")
-        )
-)
