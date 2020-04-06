@@ -2,8 +2,11 @@ package com.example
 
 import com.example.api.users.UserApiService
 import com.example.api.users.UserApiServiceImpl
+import com.example.core.config.Config
+import com.example.domain.database.DbSettings
 import com.example.domain.users.UserDomainServiceImpl
 import com.example.routers.users
+import com.sksamuel.hoplite.ConfigLoader
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.auth.Authentication
@@ -44,7 +47,9 @@ fun Application.module(testing: Boolean = false) {
         json()
     }
 
-    moduleWithDependencies(UserApiServiceImpl(UserDomainServiceImpl()))
+    val config = ConfigLoader().loadConfigOrThrow<Config>("/application.conf")
+
+    moduleWithDependencies(UserApiServiceImpl(UserDomainServiceImpl(DbSettings(config))))
 }
 
 fun Application.moduleWithDependencies(userApiService: UserApiService) {
